@@ -14,11 +14,11 @@ import math
 import time
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--input_dir", help="path to folder containing images")
-parser.add_argument("--mode", required=True, choices=["train", "test", "export"])
-parser.add_argument("--output_dir", required=True, help="where to put output files")
+# parser.add_argument("--input_dir", help="path to folder containing images")
+# parser.add_argument("--mode", required=True, choices=["train", "test", "export"])
+# parser.add_argument("--output_dir", required=True, help="where to put output files")
 parser.add_argument("--seed", type=int)
-parser.add_argument("--checkpoint", default=None, help="directory with checkpoint to resume training from or use for testing")
+# parser.add_argument("--checkpoint", default=None, help="directory with checkpoint to resume training from or use for testing")
 
 parser.add_argument("--max_steps", type=int, help="number of training steps (0 to disable)")
 parser.add_argument("--max_epochs", type=int, help="number of training epochs")
@@ -32,7 +32,7 @@ parser.add_argument("--separable_conv", action="store_true", help="use separable
 parser.add_argument("--aspect_ratio", type=float, default=1.0, help="aspect ratio of output images (width/height)")
 parser.add_argument("--lab_colorization", action="store_true", help="split input image into brightness (A) and color (B)")
 parser.add_argument("--batch_size", type=int, default=1, help="number of images in batch")
-parser.add_argument("--which_direction", type=str, default="AtoB", choices=["AtoB", "BtoA"])
+# parser.add_argument("--which_direction", type=str, default="AtoB", choices=["AtoB", "BtoA"])
 parser.add_argument("--ngf", type=int, default=64, help="number of generator filters in first conv layer")
 parser.add_argument("--ndf", type=int, default=64, help="number of discriminator filters in first conv layer")
 parser.add_argument("--scale_size", type=int, default=286, help="scale images to this size before cropping to 256x256")
@@ -47,6 +47,11 @@ parser.add_argument("--gan_weight", type=float, default=1.0, help="weight on GAN
 # export options
 parser.add_argument("--output_filetype", default="png", choices=["png", "jpeg"])
 a = parser.parse_args()
+a.mode = "test"
+a.input_dir = "Input"
+a.output_dir = "Output"
+a.checkpoint = "Checkpoint"
+a.which_direction = "AtoB"
 
 EPS = 1e-12
 CROP_SIZE = 256
@@ -532,7 +537,7 @@ def append_index(filesets, step=False):
         index.write("</tr>")
     return index_path
 
-
+# I need this
 def main():
     if a.seed is None:
         a.seed = random.randint(0, 2**31 - 1)
@@ -722,7 +727,7 @@ def main():
             max_steps = examples.steps_per_epoch * a.max_epochs
         if a.max_steps is not None:
             max_steps = a.max_steps
-
+# I need this
         if a.mode == "test":
             # testing
             # at most, process the test data once
