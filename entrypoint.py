@@ -15,11 +15,6 @@ import time
 import ai_integration
 
 parser = argparse.ArgumentParser()
-# parser.add_argument("--input_dir", help="path to folder containing images")
-# parser.add_argument("--mode", required=True, choices=["train", "test", "export"])
-# parser.add_argument("--output_dir", required=True, help="where to put output files")
-parser.add_argument("--seed", type=int)
-# parser.add_argument("--checkpoint", default=None, help="directory with checkpoint to resume training from or use for testing")
 
 parser.add_argument("--max_steps", type=int, help="number of training steps (0 to disable)")
 parser.add_argument("--max_epochs", type=int, help="number of training epochs")
@@ -238,7 +233,7 @@ def lab_to_rgb(lab):
 
 def load_examples():
     if a.input_dir is None or not os.path.exists(a.input_dir):
-        raise Exception("input_dir does not exist")
+        raise Exception("input directory does not exist")
 
     input_paths = glob.glob(os.path.join(a.input_dir, "*.jpg"))
     decode = tf.image.decode_jpeg
@@ -247,7 +242,7 @@ def load_examples():
         decode = tf.image.decode_png
 
     if len(input_paths) == 0:
-        raise Exception("input_dir contains no image files")
+        raise Exception("input directory contains no image files")
 
     def get_name(path):
         name, _ = os.path.splitext(os.path.basename(path))
@@ -540,8 +535,7 @@ def append_index(filesets, step=False):
 
 # I need this
 def main():
-    if a.seed is None:
-        a.seed = random.randint(0, 2**31 - 1)
+    a.seed = random.randint(0, 2**31 - 1)
 
     tf.set_random_seed(a.seed)
     np.random.seed(a.seed)
@@ -550,9 +544,8 @@ def main():
     if not os.path.exists(a.output_dir):
         os.makedirs(a.output_dir)
 
-    if a.mode == "test" or a.mode == "export":
         if a.checkpoint is None:
-            raise Exception("checkpoint required for test mode")
+            raise Exception("checkpoint required to run")
 
         # load some options from the checkpoint
         options = {"which_direction", "ngf", "ndf", "lab_colorization"}
@@ -564,12 +557,6 @@ def main():
         # disable these features in test mode
         a.scale_size = CROP_SIZE
         a.flip = False
-
-    for k, v in a._get_kwargs():
-        print(k, "=", v)
-
-    with open(os.path.join(a.output_dir, "options.json"), "w") as f:
-        f.write(json.dumps(vars(a), sort_keys=True, indent=4))
 
     examples = load_examples()
     print("examples count = %d" % examples.count)
